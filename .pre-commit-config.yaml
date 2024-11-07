@@ -1,0 +1,47 @@
+repos:
+  - repo: https://github.com/aws-samples/automated-security-helper
+    rev: "1.0.9-e-16May2023" # update with the latest tagged version in the repository
+    hooks:
+      - id: ash
+        name: scan files using ash
+        stages: [manual]
+        # uncomment the line below if using "finch" on MacOS
+        args:
+          - --oci-runner finch
+
+  # FORMATTING & MISC
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: fix-byte-order-marker
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args:
+          - --allow-missing-credentials
+
+  # Terraform
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.77.0
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+      - id: terraform_tflint
+        args:
+          - --args=--module
+          - --args=--enable-rule=terraform_documented_variables
+      - id: terraform_docs
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+          - --hook-config=--create-file-if-not-exist=true
+          - --args=--config=.terraform-docs.yml
+      - id: terraform_checkov
+        args:
+          - --args=--soft-fail
+          - --args=--compact
